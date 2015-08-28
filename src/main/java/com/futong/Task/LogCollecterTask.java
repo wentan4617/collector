@@ -50,7 +50,6 @@ public class LogCollecterTask implements Job {
 		log.info("当前日志所在主机为："+hostIp+" 日志名称为" + logName);
 		this.lastCount = dao.getLastCount(hostIp,logName);
 		String cmd_count_size = "wc -l -c " + logName;
-		
 		try {
 			String result = execRemoteCommand(cmd_count_size,true);
 			String[] arr = result.split(" ");
@@ -78,11 +77,6 @@ public class LogCollecterTask implements Job {
 		this.conn = (SSHConn) map.get(ConstantUtils.SSHCONN);
 		this.hostIp = conn.getConn().getHostname();
 		this.dao = new BaseDao();
-		log.info("logName = " + logName);
-		log.info("logType = " + logType);
-		log.info("sender = " + sender);
-		log.info("conn = " + conn);
-		log.info("hostIp = " + hostIp);
 	}
 	
 	public String execRemoteCommand(String command,boolean isReturn) {

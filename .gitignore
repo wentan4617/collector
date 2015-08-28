@@ -1,9 +1,9 @@
 *.class
-target/
-.myeclipse/
-.settings/
-logs/
-mvc/
+target
+.myeclipse
+.settings
+logs
+mvc
 .classpath
 .project
 pom.xml
