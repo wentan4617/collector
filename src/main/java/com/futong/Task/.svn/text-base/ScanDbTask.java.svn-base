@@ -1,0 +1,28 @@
+package com.futong.Task;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import com.futong.server.ProcessServer;
+
+/**
+ * 定时扫描数据库任务
+ * @author went
+ *
+ */
+public class ScanDbTask implements Job {
+	
+	@Override
+	public void execute(JobExecutionContext context)
+			throws JobExecutionException {
+		ProcessServer processServer = ProcessServer.getInstance();
+		try {
+			processServer.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+}

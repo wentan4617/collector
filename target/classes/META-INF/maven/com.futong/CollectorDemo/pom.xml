@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.futong</groupId>
+  <artifactId>CollectorDemo</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>CollectorDemo</name>
+  <url>http://maven.apache.org</url>
+	<!-- 指定属性 -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<junit.version>4.10</junit.version>
+		<jdk.version>1.7</jdk.version>
+		<quartz.version>2.2.1</quartz.version>
+		<mongodb.version>3.0.2</mongodb.version>
+	</properties>
+		<build>
+		<plugins>
+			<!-- 指定JDK的编译版本 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+    
+    <!-- 任务调度器quartz的依赖 -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.12</version>
+		</dependency>
+		<dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.12</version>
+    </dependency>
+<!--     mongoDB的依赖 -->
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongodb-driver</artifactId>
+    <version>${mongodb.version}</version>
+</dependency>
+<!-- ssh连接器依赖 -->
+<dependency>
+    <groupId>ch.ethz.ganymed</groupId>
+    <artifactId>ganymed-ssh2</artifactId>
+    <version>262</version>
+</dependency>
+
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>18.0</version>
+</dependency>
+
+<dependency>
+  <groupId>org.graylog2</groupId>
+  <artifactId>gelfclient</artifactId>
+  <version>1.0.0</version>
+</dependency>
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.3.1</version>
+</dependency>
+ <!-- Tomcat Servlet API -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-grizzly2-servlet</artifactId>
+      <version>2.13</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet-core</artifactId>
+      <version>2.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>2.13</version>
+    </dependency>
+    <!-- Required only when you are using JAX-RS Client -->
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>2.13</version>
+    </dependency>
+    
+<!--     rest client  -->
+    <dependency>
+    <groupId>commons-httpclient</groupId>
+    <artifactId>commons-httpclient</artifactId>
+    <version>3.1</version>
+</dependency>
+  </dependencies>
+</project>
