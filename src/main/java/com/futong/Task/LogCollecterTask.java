@@ -51,7 +51,6 @@ public class LogCollecterTask implements Job {
 		this.lastCount = dao.getLastCount(hostIp,logName);
 		String cmd_count_size = "wc -l -c " + logName;
 		
-//		String cmd_count = "wc -l " + logName;
 		try {
 			String result = execRemoteCommand(cmd_count_size,true);
 			String[] arr = result.split(" ");
