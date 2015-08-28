@@ -44,7 +44,6 @@ public class LogCollecterTask implements Job {
 			throws JobExecutionException {
 		log.info("》》》》》》》》》》》》采集任务开始《《《《《《《《《《《《《《《《");
 		if(logName == null || logType == null || sender == null || conn == null || hostIp == null || dao == null){
-			log.info("********************************首次进入**********************************");
 			init(context);
 		}
 		
