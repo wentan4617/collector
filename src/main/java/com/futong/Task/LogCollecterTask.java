@@ -42,19 +42,20 @@ public class LogCollecterTask implements Job {
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
-		log.info("》》》》》》》》》》》》采集任务开始《《《《《《《《《《《《《《《《");
+		
 		if(logName == null || logType == null || sender == null || conn == null || hostIp == null || dao == null){
 			init(context);
 		}
-		
-		log.info("当前日志所在主机为："+hostIp+" 日志名称为" + logName);
+		log.info("采集任务：" + hostIp +"-"+logName +" 开始");
 		this.lastCount = dao.getLastCount(hostIp,logName);
 		String cmd_count_size = "wc -l -c " + logName;
+		
 		try {
 			String result = execRemoteCommand(cmd_count_size,true);
+			log.info("cmd_count_size 的值是：" + result);
 			String[] arr = result.split(" ");
 			long currCount = Long.parseLong(arr[2]);
-			int currSize = Integer.parseInt(arr[3]);
+			long currSize = Long.parseLong(arr[3]);
 			dao.updateCurr(logName,hostIp,currCount,currSize,System.currentTimeMillis());
 			long diff = currCount > lastCount ? currCount - lastCount : 0;
 			

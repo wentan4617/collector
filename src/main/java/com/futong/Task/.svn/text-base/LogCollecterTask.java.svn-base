@@ -42,20 +42,20 @@ public class LogCollecterTask implements Job {
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
+		
 		if(logName == null || logType == null || sender == null || conn == null || hostIp == null || dao == null){
 			init(context);
 		}
-		
-		
+		log.info("采集任务：" + hostIp +"-"+logName +" 开始");
 		this.lastCount = dao.getLastCount(hostIp,logName);
 		String cmd_count_size = "wc -l -c " + logName;
 		
-//		String cmd_count = "wc -l " + logName;
 		try {
 			String result = execRemoteCommand(cmd_count_size,true);
+			log.info("cmd_count_size 的值是：" + result);
 			String[] arr = result.split(" ");
 			long currCount = Long.parseLong(arr[2]);
-			int currSize = Integer.parseInt(arr[3]);
+			long currSize = Long.parseLong(arr[3]);
 			dao.updateCurr(logName,hostIp,currCount,currSize,System.currentTimeMillis());
 			long diff = currCount > lastCount ? currCount - lastCount : 0;
 			
@@ -70,6 +70,7 @@ public class LogCollecterTask implements Job {
 
 
 	private void init(JobExecutionContext context) {
+		log.info("初始化采集参数");
 		JobDataMap map = context.getJobDetail().getJobDataMap();
 		this.logName = map.getString(ConstantUtils.LOGNAME);
 		this.logType = map.getString(ConstantUtils.LOGTYPE);
@@ -101,7 +102,11 @@ public class LogCollecterTask implements Job {
 							System.out.println(count);
 						}	
 					}
-				}		
+				}else{
+					while ((line = buff.readLine()) != null) {
+						return line;
+					}
+				}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} finally {

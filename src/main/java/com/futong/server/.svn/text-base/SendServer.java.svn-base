@@ -2,6 +2,7 @@ package com.futong.server;
 
 import java.net.InetSocketAddress;
 
+import org.apache.log4j.Logger;
 import org.graylog2.gelfclient.GelfConfiguration;
 import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.GelfMessageBuilder;
@@ -14,7 +15,9 @@ import org.graylog2.gelfclient.transport.GelfTransport;
  *
  */
 public class SendServer {
-	
+	private static final Logger log = Logger.getLogger(SendServer.class); 
+	private static String targetIp = "192.168.122.69";
+	private static Integer targetPort = 12201;
 	private static SendServer sendServer;
 	
 	public static SendServer getInstance(){
@@ -33,7 +36,8 @@ public class SendServer {
 	
 	
 	public void start() {
-		GelfConfiguration config = new GelfConfiguration(new InetSocketAddress("192.168.122.69", 12201))
+		log.info("启动graylog2 发送器");
+		GelfConfiguration config = new GelfConfiguration(new InetSocketAddress(targetIp, targetPort))
            .transport(GelfTransports.TCP)
            .queueSize(512)
            .connectTimeout(5000)

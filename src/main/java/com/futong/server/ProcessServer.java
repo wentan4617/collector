@@ -26,12 +26,12 @@ public class ProcessServer {
 	private BaseDao dao;
 	
 	private ProcessServer() {
-		// TODO Auto-generated constructor stub
+		
 		dao = new BaseDao();
 	}
 
 
-	//缓存的主机列表
+	
 	private TaskServer taskServer = TaskServer.getInstance();
 	
 	//缓存所有主机的SSHConn
@@ -39,13 +39,41 @@ public class ProcessServer {
 	
 	private SendServer sender = SendServer.getInstance();
 	
+	//重启采集程序时运行一次初始化
+		public void bootstrap() throws Exception{
+			log.info("初始化采集机");
+			//1、查询所有的logFile
+			List<LogFile> logFiles = dao.getAllLogfiles();
+			//2、获得所有主机列表
+			List<Host> hosts = dao.getAllHost();
+			//
+			if(hosts != null && hosts.size() >0 ){
+				init(hosts);
+			}else{
+				log.error("请先增加被采集主机");
+				throw new Exception("还没有配置主机");
+			}
+			
+			
+			//2更新数据库，将所有状态改为没有改动 
+			//TODO host状态没有改变，还没有想好。
+			this.updateDb();
+			//3将所有logFile加入调度
+			this.bootStrapAllJobs(logFiles);
+			//4将ScanDbTask加入调度
+			this.taskServer.addScanDbTask();
+			log.info("初始化采集机成功");
+		}
+	
 	//采集程序流程入口
 	public void start() throws Exception{
-		
-		//1查询数据库获得所有host以及所属log
+		log.info("同步流程启动");
+		//1、查询所有状态是“更改”的logFile
+		log.info("查询所有状态是“更改”的logFile");
 		List<LogFile> logFiles = this.getAllChangedLogFile();
+		//2、获得所有主机列表
+		log.info("获得所有主机列表");
 		List<Host> hosts = this.getAllHost();
-		log.info("1查询数据库获得所有host以及所属log 其中host有 : "+hosts.size()+"个，logfile有 ："+logFiles.size()+"个");
 		//
 		if(hosts != null && hosts.size() >0 ){
 			init(hosts);
@@ -60,8 +88,7 @@ public class ProcessServer {
 		//3根据状态更新任务
 		this.updateSchedule(logFiles);
 		
-//		this.taskServer.addScanDbTask();
-		
+		log.info("同步流程结束");
 	}
 	
 	
@@ -73,6 +100,7 @@ public class ProcessServer {
 			}
 			String ip = host.getIp();
 			if(!sshConnMap.containsKey(ip)){
+				log.info("新增主机：" + ip);
 				SSHConn conn = new SSHConn(host);
 				sshConnMap.put(ip, conn);
 			}
@@ -84,7 +112,7 @@ public class ProcessServer {
 		boolean flag = host.getState() == ConstantUtils.DELETE ? true : false;
 		if(flag){
 			try {
-				log.info("主机 "+host.getIp() +" 的状态为删除");
+				log.info("删除主机 "+host.getIp());
 				dao.deleteHost(host.getIp());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -98,9 +126,10 @@ public class ProcessServer {
 		return dao.getAllHost();
 	}
 
-
+	/**
+	 * 更新数据库，将所有主机以及logFile的状态改为没有改变
+	 */
 	private void updateDb() {
-		// 1、锁住数据库 2、删除标记为删除的logFile 3、所有状态置为0
 		dao.updateDb();
 	}
 
@@ -122,28 +151,44 @@ public class ProcessServer {
 			l.setSshConn(conn);
 			if(l.getLogState() == ConstantUtils.CHANGED){
 				//1表示有改动
+				log.info("更新调度任务 ：" + l.getHostIp()+":/"+l.getLogName());
 				taskServer.update(l);
 				
 			}
 			if(l.getLogState() == ConstantUtils.DELETE){
 				//2表示删除
+				log.info("删除调度任务 ：" + l.getHostIp()+":/"+l.getLogName());
 				taskServer.delete(l);
 			}
 			if(l.getLogState() == ConstantUtils.NEW){
 				//3表示新增
+				log.info("新增调度任务 ：" + l.getHostIp()+":/"+l.getLogName());
 				taskServer.addLogCollectTask(l);
 			}
 		}
 		
-		
 	}
-
+	private void bootStrapAllJobs(List<LogFile> logFiles) {
+		for(LogFile l : logFiles){
+			SSHConn conn = sshConnMap.get(l.getHostIp());
+			if(conn != null){
+				l.setSender(sender);
+				l.setSshConn(conn);
+				//3新增job
+				log.info("初始化调度任务 ：" + l.getHostIp()+":/"+l.getLogName());
+				taskServer.addLogCollectTask(l);
+			}else{
+				//TODO 逻辑上不存在这种情况。除非init方法出错。
+				log.error("sshConnMap中没有响应的conn，请检查host初始化方法init");
+			}
+			
+		}
+	}
 
 
 
 	
 	private static <T> T compareObject(T t1,T t2){
-		
 		return t2;
 		
 	}

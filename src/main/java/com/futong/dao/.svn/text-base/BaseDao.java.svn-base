@@ -91,7 +91,7 @@ public class BaseDao {
 	public void updateDb() {
 		MongoCollection logfile = this.db.getCollection(ConstantUtils.LOGFILE);
 		BasicDBObject filter = new BasicDBObject("logState",new BasicDBObject().append(QueryOperators.EXISTS,true));
-		BasicDBObject updater = new BasicDBObject("logState",0);
+		BasicDBObject updater = new BasicDBObject("logState",ConstantUtils.NOTCHANGE);
 		BasicDBObject updateSetValue=new BasicDBObject("$set",updater);
 		logfile.updateMany(filter, updateSetValue);
 	}
@@ -121,7 +121,7 @@ public class BaseDao {
 		BasicDBObject condition3 = new BasicDBObject("lastCount",new BasicDBObject().append(QueryOperators.EXISTS, true));
 		condList.add(condition1);
 		condList.add(condition2);
-		condList.add(condition3);
+		condList.add(condition3);  
 		BasicDBObject filter = new BasicDBObject().append(QueryOperators.AND,condList);
 		MongoCursor cur = logfile.find(filter).iterator();
 		long lastCount = 0;
@@ -149,15 +149,15 @@ public class BaseDao {
 		}
 		return lastModify;
 	}
-	public void updateCurr(String logName, String hostIp, long currCount, int currSize, long currentTimeMillis) {
+	public void updateCurr(String logName, String hostIp, long currCount, long currSize, long currentTimeMillis) {
 		MongoCollection<Document> logfile = this.db.getCollection(ConstantUtils.LOGFILE);
 		BasicDBList condList = new BasicDBList(); 
 		BasicDBObject condition1 = new BasicDBObject("hostIp",hostIp);
 		BasicDBObject condition2 = new BasicDBObject("logName",logName);
 		condList.add(condition1);
 		condList.add(condition2);
-		BasicDBObject update = new BasicDBObject().append("currCount",currCount)
-													.append("currSize",currSize)
+		BasicDBObject update = new BasicDBObject().append("lastCount",currCount)
+													.append("lastSize",currSize)
 													.append("lastModify",currentTimeMillis);
 		BasicDBObject filter = new BasicDBObject().append(QueryOperators.AND,condList);
 		BasicDBObject updateSetValue=new BasicDBObject().append("$set",update);
@@ -328,6 +328,20 @@ public class BaseDao {
 		}
 		return isSuccess;
 		
+	}
+
+
+
+	public List<LogFile> getAllLogfiles() {
+		MongoCollection logFile = this.db.getCollection(ConstantUtils.LOGFILE);
+		MongoCursor rs = logFile.find().iterator();
+		List<LogFile> logFiles = new ArrayList<>(); 
+		while(rs.hasNext()){
+			 Document d = (Document) rs.next();
+			 LogFile l = this.documentToLogFile(d);
+			 logFiles.add(l);
+		}
+		 return logFiles;
 	}
 
 

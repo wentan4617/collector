@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.glassfish.jersey.server.ServerProperties;
@@ -15,6 +16,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import com.futong.resource.CollectorResource;
 
 public class RestServer {
+	private static Logger log = Logger.getLogger(RestServer.class);
 	 private int port = 8888;
 	 private URI BASE_URI;
 	 private static RestServer restServer;
@@ -32,6 +34,7 @@ public class RestServer {
 			InetAddress addr = InetAddress.getLocalHost();
 			String ip=addr.getHostAddress().toString();//自动获得本机IP
 			BASE_URI = URI.create("http://"+ip+":"+port+"/");
+			log.info("RestServer的url是：" + BASE_URI);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -39,6 +42,7 @@ public class RestServer {
 	 }
 	 
 	 public void start() {
+		 log.info("RestServer启动");
 	        try {
 	            Map<String, String> initParams = new HashMap<String, String>();
 	            initParams.put(ServerProperties.PROVIDER_PACKAGES,  CollectorResource.class.getPackage().getName());
@@ -50,6 +54,7 @@ public class RestServer {
 	  }
 	 public void stop(){
 		 server.shutdownNow();
+		 log.info("RestServer关闭");
 	 }
 	 public static void main(String[] args) {
 		 RestServer server = RestServer.getInstance();

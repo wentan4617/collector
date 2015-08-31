@@ -49,17 +49,15 @@ public class TaskServer {
 	 * 启动任务调度服务器
 	 */
 	public void start() throws Exception {
+		log.info("启动任务调度器");
 		SchedulerFactory sf = new StdSchedulerFactory(); 
 		try {
-			log.debug("启动任务调度器");
 			scheduler = sf.getScheduler();
 			scheduler.start();
-			//定时扫描数据库
-			addScanDbTask();
+			log.info("启动任务调度器成功");
 		} catch (SchedulerException e) {
-			log.error("start task scheduler Manager Server error.", e);
-			throw new Exception(
-					"start task scheduler Manager Server error.", e);
+			log.error("启动任务调度器失败", e);
+			throw new Exception("启动任务调度器失败", e);
 		}
 		
 	}
@@ -79,10 +77,11 @@ public class TaskServer {
 	}
 	
 	public void scheduleCollectTask(JobDataMap dataMap) throws Exception {
+		
 		String jobName = dataMap.getString(ConstantUtils.LOGNAME);
 		String jobGroup = dataMap.getString(ConstantUtils.COLLECTGROUPID);
 		int interval = dataMap.getInt(ConstantUtils.COLLECTINTERVAL);
-		
+		log.info("添加调度任务 ：" + jobGroup + "-" +jobName);
 		JobDetail job = JobBuilder.newJob(LogCollecterTask.class)
 				.withIdentity(jobName,jobGroup )
 				.setJobData(dataMap)
@@ -121,6 +120,7 @@ public class TaskServer {
 	
 
 	public void addScanDbTask() throws SchedulerException {
+		log.info("将ScanDbTask加入任务调度器");
 		JobDetail job = JobBuilder.newJob(ScanDbTask.class)
 				.withIdentity("scanDbTask",Scheduler.DEFAULT_GROUP)
 				.build();
@@ -134,7 +134,7 @@ public class TaskServer {
 				.withIdentity("scanDbTask",Scheduler.DEFAULT_GROUP)
 				.build();
 			scheduler.scheduleJob( job,trigger);// todo 是否考虑将相同周期、相同连接参数的任务编组执行
-		
+		log.info("当前ScanDbTask的名称是：scanDbTask 所属调度组是" + Scheduler.DEFAULT_GROUP);
 	}
 
 //	private LogCollecterTask logFileToTask(LogFile l) {
