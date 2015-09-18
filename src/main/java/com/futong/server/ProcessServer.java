@@ -39,7 +39,7 @@ public class ProcessServer {
 	
 	private SendServer sender = SendServer.getInstance();
 	
-	//重启采集程序时运行一次初始化
+	//run once when collector bootstrap 
 		public void bootstrap() throws Exception{
 			log.info("初始化采集机");
 			//1、查询所有的logFile
@@ -51,7 +51,7 @@ public class ProcessServer {
 				init(hosts);
 			}else{
 				log.error("请先增加被采集主机");
-				throw new Exception("还没有配置主机");
+				//throw new Exception("还没有配置主机");
 			}
 			
 			
