@@ -3,6 +3,7 @@ target/
 .settings/
 logs/
 mvc/
+.svn/
 .classpath
 .project
 pom.xml

@@ -40,31 +40,34 @@ public class ProcessServer {
 	private SendServer sender = SendServer.getInstance();
 	
 	//run once when collector bootstrap 
-		public void bootstrap() throws Exception{
-			log.info("初始化采集机");
+	public void bootstrap() throws Exception{
+		log.info("初始化采集机");
+		//0检查mongodb中是否有相应的document,没有就新建一个
+		dao.checkDb();
 			//1、查询所有的logFile
-			List<LogFile> logFiles = dao.getAllLogfiles();
+		List<LogFile> logFiles = dao.getAllLogfiles();
 			//2、获得所有主机列表
-			List<Host> hosts = dao.getAllHost();
+		List<Host> hosts = dao.getAllHost();
 			//
-			if(hosts != null && hosts.size() >0 ){
-				init(hosts);
-			}else{
-				log.error("请先增加被采集主机");
-				//throw new Exception("还没有配置主机");
-			}
-			
-			
-			//2更新数据库，将所有状态改为没有改动 
-			//TODO host状态没有改变，还没有想好。
-			this.updateDb();
-			//3将所有logFile加入调度
-			this.bootStrapAllJobs(logFiles);
-			//4将ScanDbTask加入调度
-			this.taskServer.addScanDbTask();
-			log.info("初始化采集机成功");
+		if(hosts != null && hosts.size() >0 ){
+			init(hosts);
+		}else{
+			log.error("请先增加被采集主机");
+			//throw new Exception("还没有配置主机");
 		}
+			
+			
+		//2更新数据库，将所有状态改为没有改动 
+		//TODO host状态没有改变，还没有想好。
+		this.updateDb();
+		//3将所有logFile加入调度
+		this.bootStrapAllJobs(logFiles);
+		//4将ScanDbTask加入调度
+		this.taskServer.addScanDbTask();
+		log.info("初始化采集机成功");
+	}
 	
+
 	//采集程序流程入口
 	public void start() throws Exception{
 		log.info("同步流程启动");
@@ -99,7 +102,7 @@ public class ProcessServer {
 				continue;//结束本次循环，进行下一次。
 			}
 			String ip = host.getIp();
-			if(!sshConnMap.containsKey(ip)){
+			if(!sshConnMap.containsKey(ip) && ip != "default"){
 				log.info("新增主机：" + ip);
 				SSHConn conn = new SSHConn(host);
 				sshConnMap.put(ip, conn);
@@ -193,9 +196,5 @@ public class ProcessServer {
 		
 	}
 	public static void main(String[] args) {
-		String s1 = "went";
-		String s2 = "shuishui";
-		String r = compareObject(s1,s2);
-		System.out.println(r);
 	}
 }

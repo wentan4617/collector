@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
 import org.bson.Document;
 
 import com.futong.conn.DbConn;
@@ -343,7 +344,27 @@ public class BaseDao {
 		}
 		 return logFiles;
 	}
-
+	
+	//检查是否存在两个
+	public void checkDb() throws Exception{
+		if(this.getAllLogfiles().size() == 0){
+			LogFile f = new LogFile();
+			f.setHostIp("default");
+			f.setLogName("default");
+			f.setLogType("default");
+			//状态为没有改变，不会加入到调度队列
+			this.addLogfile(f);
+		}
+		if(this.getAllHost().size() == 0){
+			Host h = new Host();
+			h.setHostname("localhost");
+			h.setTypeName("default");
+			h.setUsername("-");
+			h.setPassword("-");
+			h.setIp("default");
+			this.addHost(h);
+		}
+	}
 
 
 	
